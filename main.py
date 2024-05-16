@@ -1,13 +1,9 @@
-from ryanair import Ryanair
-from ryanair.types import Flight
 import dash
 from dash import dcc, html, Input, Output, State, dash_table
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
 from datetime import datetime, timedelta
-from ryanair import Ryanair
-from ryanair.types import Flight
 import pandas as pd
 
 from arima import predict_prices
@@ -16,49 +12,74 @@ from ryanair_api import get_flights, convert_to_df
 routes_df = pd.read_csv('routes.csv', encoding='ISO-8859-1', delimiter=";")
 
 # Initialize the app
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.UNITED])
 
 # App layout
-app.layout = html.Div([
+app.layout = dbc.Container([
     html.H1("Airplane Ticket Price Predictor", style={
-        'fontFamily': 'Arial',
         'fontWeight': 'bold',
-        'fontSize': '24px',
+        'fontSize': '40px',
         'textAlign': 'center',
-        'marginBottom': '20px'  # Adds space below the title
+        'marginBottom': '20px',  # Adds space below the title
+        'color': '#002379' 
     }),
-    dcc.Dropdown(
-        id='origin-dropdown',
-        options=[{'label': i, 'value': i} for i in sorted(routes_df['origin_city'].unique())],
-        value='Budapest,BUD',
-        multi=False,
-        style={'fontFamily': 'Arial'}
-    ),
-    dcc.Dropdown(
-        id='destination-dropdown',
-        options=[],
-        value='London,STN',
-        multi=False,
-        style={'fontFamily': 'Arial'}
-    ),
-    dcc.DatePickerSingle(
-        id='date-picker-from',
-        min_date_allowed=datetime.today() + timedelta(days=1),
-        max_date_allowed=datetime.today() + timedelta(days=100),
-        initial_visible_month=datetime.today(),
-        date=datetime.today() + timedelta(days=1),
-        display_format='YYYY.MM.DD'
-    ),
-    dcc.DatePickerSingle(
-        id='date-picker-to',
-        min_date_allowed=datetime.today() + timedelta(days=1),
-        max_date_allowed=datetime.today() + timedelta(days=100),
-        initial_visible_month=datetime.today(),
-        date=datetime.today() + timedelta(days=1),
-        display_format='YYYY.MM.DD'
-    ),
-    html.Button('Submit', id='submit-button', n_clicks=0, style={'fontFamily': 'Arial'}),
-    html.Button('Sort by Price', id='sort-button', n_clicks=0, style={'fontFamily': 'Arial'}),
+    dbc.Row([
+        dbc.Col(
+            dcc.Dropdown(
+                id='origin-dropdown',
+                options=[{'label': i, 'value': i} for i in sorted(routes_df['origin_city'].unique())],
+                value='Budapest,BUD',
+                multi=False,
+                #style={'fontFamily': 'Arial'}
+                className='dropdown-container'
+            ),
+            width=6,
+            style={'paddingRight': '10px', 'paddingBottom': '10px'}),
+        dbc.Col(
+            dcc.Dropdown(
+                id='destination-dropdown',
+                options=[],
+                value='London,STN',
+                multi=False,
+                className='dropdown-container'
+            ),
+        width=6,
+        style={'paddingLeft': '10px', 'paddingBottom': '10px'})]),
+    dbc.Row([
+        dbc.Col(
+            dcc.DatePickerSingle(
+                id='date-picker-from',
+                min_date_allowed=datetime.today() + timedelta(days=1),
+                max_date_allowed=datetime.today() + timedelta(days=100),
+                initial_visible_month=datetime.today(),
+                date=datetime.today() + timedelta(days=1),
+                display_format='YYYY.MM.DD'
+            ),
+        style={'paddingRight': '5px','paddingBottom': '10px'}),
+        dbc.Col(
+            dcc.DatePickerSingle(
+                id='date-picker-to',
+                min_date_allowed=datetime.today() + timedelta(days=2),
+                max_date_allowed=datetime.today() + timedelta(days=100),
+                initial_visible_month=datetime.today(),
+                date=datetime.today() + timedelta(days=2),
+                display_format='YYYY.MM.DD'
+            ),
+        style={'paddingBottom': '10px'})]),
+
+    html.Button('Submit', id='submit-button', n_clicks=0, style={
+        'background-color': '#002379', 
+        'color': 'white', 
+        'border-radius': '5px', 
+        'border': 'none', 
+        'marginBottom': '10px', 
+        'marginRight': '10px'}),
+    html.Button('Sort by Price', id='sort-button', n_clicks=0, style={
+        'background-color': '#FF9F66', 
+        'color': 'white', 
+        'border-radius': '5px', 
+        'border': 'none', 
+        'marginBottom': '10px'}),
     dash_table.DataTable(
         id='flights-table',
         columns=[
