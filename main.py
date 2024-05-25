@@ -203,18 +203,39 @@ def update_graph(selected_rows, current_data):
                                        flight_data['price'])
         fig = px.line(prediction_df, x='date', y='price', title='Fare Prices Over Time')
 
-        # ezeket probaltam es nem mukodnek
+        current_date = pd.Timestamp(datetime.now().date())
+        fig.update_layout(
+            shapes=[
+                dict(
+                    type="line",
+                    xref="x",
+                    yref="paper",
+                    x0=current_date,
+                    y0=0,
+                    x1=current_date,
+                    y1=1,
+                    line=dict(
+                        color="red",
+                        width=2,
+                        dash="dash",
+                    ),
+                )
+            ]
+        )
 
-        # current_date = datetime.now().date()
-        # current_date_index = prediction_df.loc[prediction_df['date'] == current_date].index[0]
-        # print(current_date_index)
-
-        # fig.add_hline(y=flight_data['price'], line_dash='dash', line_color='blue', annotation_text='')
-        # fig.add_vline(x=current_date, line_dash='dash', line_color='red', annotation_text='Current Date')
-        # fig.update_traces(marker=dict(color='blue', line=dict(color='blue')),
-        #                   selector=dict(type='scatter', x=prediction_df['date'] <= current_date))
-        # fig.update_traces(marker=dict(color='green', line=dict(color='green')),
-        #                   selector=dict(type='scatter', x=prediction_df['date'] > current_date))
+        fig.add_annotation(
+            x=current_date,
+            y=1.05, 
+            xref="x",
+            yref="paper",
+            text="Current Date",
+            showarrow=False,
+            font=dict(
+                size=12,
+                color="black"
+            ),
+            align="center"
+        )
 
         fig.update_layout({
             'plot_bgcolor': 'rgba(0, 0, 0, 0)',
