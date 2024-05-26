@@ -62,7 +62,7 @@ app.layout = dbc.Container([
                 min_date_allowed=datetime.today() + timedelta(days=2),
                 max_date_allowed=datetime.today() + timedelta(days=100),
                 initial_visible_month=datetime.today(),
-                date=datetime.today() + timedelta(days=2),
+                #date=datetime.today() + timedelta(days=2),
                 display_format='YYYY.MM.DD'
             ),
         style={'paddingBottom': '10px'})]),
@@ -113,12 +113,12 @@ app.layout = dbc.Container([
 
 @app.callback(
     [Output('date-picker-to', 'min_date_allowed'), Output('date-picker-to', 'max_date_allowed'), ],
-    [Input('date-picker-from', 'date'), Input('date-picker-to', 'date')]
+    [Input('date-picker-from', 'date')]
 )
-def update_min_date_allowed_to(selected_date_from, selected_date_to):
+def update_min_date_allowed_to(selected_date_from):
     if selected_date_from is not None:
         selected_date_from = datetime.fromisoformat(selected_date_from).date()
-        selected_date_to = datetime.fromisoformat(selected_date_to).date()
+        #selected_date_to = datetime.fromisoformat(selected_date_to).date()
 
         return selected_date_from, selected_date_from + timedelta(days=100)
     else:
@@ -164,6 +164,8 @@ def update_flights_table(submit_clicks, sort_clicks, origin, destination, date_f
     triggered_input = ctx.triggered[0]['prop_id'].split('.')[0]
 
     if triggered_input == 'submit-button':
+        if date_to is None:
+            date_to = date_from
         # flights_df = get_flights(origin.split(',')[1], destination.split(',')[1], date_from, date_to)
         flights_df = convert_to_df(origin, destination, datetime.fromisoformat(date_from).date(),
                                    datetime.fromisoformat(date_to).date())
